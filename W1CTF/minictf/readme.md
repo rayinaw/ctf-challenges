@@ -322,7 +322,7 @@ INSERT INTO `users` (`id`, `username`, `password`, `bio`) VALUES
 Trong php, nếu ta có thể gọi đến một trang có chứa mã php thì ta có thể thao tác với nó như một trang web bình thường. Do đó người ta mới có thể sử dụng LFI kết chèn vào var-log mã `<?php ?>` các kiểu để RCE. 
 
 Vậy nên mình có thể gửi một post request để login như sau:
-![](![](/W1CTF/minictf/images/simple-stuff-2.png))
+![](/W1CTF/minictf/images/simple-stuff-2.png)
 
 Bây giờ ta có thể lấy được giá trị của id ở trong `/tmp/sess_<your-session-id>`:
 
