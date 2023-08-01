@@ -319,7 +319,7 @@ INSERT INTO `users` (`id`, `username`, `password`, `bio`) VALUES
 - `21232f297a57a5a743894a0e4a801fc3` đem đi crack thì ra `admin`.
 - Nếu đúng thì thực hiện hàm `do_xor` flag với username sau đó lưu vào biến id của phiên làm việc (session id) hiện tại.
 
-Hàm `include` trong PHP được sử dụng để nạp và thực thi nội dung của một file PHP vào một file PHP khác. Do đó nếu ta có thể nhúng một file PHP vào thì ta có thể thao tác với nó. Do đó người ta mới có thể sử dụng LFI kết chèn vào var-log mã `<?php ?>` các kiểu để RCE hoặc something else...
+Hàm `include` trong PHP được sử dụng để nạp và thực thi nội dung của một file PHP vào một file PHP khác. Do đó nếu ta có thể nhúng một file PHP vào thì ta có thể thao tác với nó. Do đó người ta mới có thể sử dụng LFI kết hợp với việc chèn vào var-log mã `<?php ?>` các kiểu rồi include vào để RCE hoặc something else...
 
 Vậy nên mình có thể gửi một post request để login như sau:
 ![](/W1CTF/minictf/images/simple-stuff-2.png)
