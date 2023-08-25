@@ -1,4 +1,74 @@
-# 
+## Express JavaScript Security
+
+Đầu tiên, ta cùng nhìn sơ qua challenge:
+- Để đọc flag ta cần RCE được web để chạy file `/readflag` lấy flag.
+```Dockerfile
+FROM node:18-bullseye-slim
+
+RUN apt-get update && \
+apt-get install -y dumb-init gcc && \
+rm -rf /var/lib/apt/lists/*
+
+RUN addgroup ejs && \
+adduser --disabled-password --gecos "" --ingroup ejs ejs
+
+WORKDIR /home/ejs/app
+RUN chown -R ejs:ejs .
+
+COPY views ./views
+COPY main.js package.json ./
+
+RUN npm install
+
+COPY flag.txt /root/flag.txt
+
+COPY readflag.c /readflag.c
+RUN gcc -o /readflag /readflag.c && rm /readflag.c
+RUN chmod +rxs /readflag
+
+USER ejs
+
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+CMD ["node", "./main.js"]
+```
+
+```js
+const express = require('express');
+const ejs = require('ejs');
+
+const app = express();
+
+app.set('view engine', 'ejs');
+
+const BLACKLIST = [
+    "outputFunctionName",
+    "escapeFunction",
+    "localsName",
+    "destructuredLocals"
+]
+
+app.get('/', (req, res) => {
+    return res.render('index');
+});
+
+app.get('/greet', (req, res) => {
+    
+    const data = JSON.stringify(req.query);
+
+    if (BLACKLIST.find((item) => data.includes(item))) {
+        return res.status(400).send('Can you not?');
+    }
+
+    return res.render('greet', {
+        ...JSON.parse(data),
+        cache: false
+    });
+});
+
+app.listen(3000, () => {
+    console.log('Server listening on port 3000')
+})
+```
 ## MANDATORY NOTES
 Trong thời gian diễn ra giải thì mình đang bận bịu với đồ án mật mã học nên cũng chưa có thời gian để xem kĩ bài này.
 
