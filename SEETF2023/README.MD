@@ -286,7 +286,7 @@ w.origin
 'https://example.com'
 ```
 Bây giờ điều ta cần làm là:
-- Làm cho độ dài khi query nhỏ hơn 2MB sao cho khi điều hướng đến ?found=0 với phần fragment sẽ vừa đủ (hoặc lớn hơn 1 ít vì `q=` và `found=0` chỉ đủ search 4 ký tự thôi)2MB và gây ra `about:blank#block`
+- Làm cho độ dài khi query nhỏ hơn 2MB sao cho khi điều hướng đến ?found=0 với phần fragment sẽ vừa đủ 2MB (hoặc lớn hơn 1 ít vì `q=` và `found=0` chỉ đủ search 4 ký tự thôi) và gây ra `about:blank#block`
 - Nếu tìm kiếm có thì fragment mới sẽ thay phần `#AAA...AAA` nên sẽ không aborted.
 
 Thời gian bị giới hạn trong 10s nên để tăng số ký tự search được mình xài `Promise.all(promises)`:
