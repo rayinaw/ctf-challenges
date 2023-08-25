@@ -1,5 +1,5 @@
 ## Express JavaScript Security
-
+<img width="806" alt="Untitled" src="https://github.com/rayinaw/ctf-challenges/assets/108481122/2e1e56bb-c804-409e-a6a4-aacd3f5b07b1">
 Đầu tiên, ta cùng nhìn sơ qua challenge:
 - Để đọc flag ta cần RCE được web để chạy file `/readflag` lấy flag.
 ```Dockerfile
