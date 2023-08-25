@@ -343,4 +343,4 @@ Thời gian bị giới hạn trong 10s nên để tăng số ký tự search đ
     </script>
 ```
 
-Mình đã xây dựng đầy đủ POC ở [đây](https://github.com/rayinaw/xsleak-server/tree/main/Chrome-URL-Length-Inflation-Server)
+Mình đã xây dựng đầy đủ POC ở [đây](https://github.com/rayinaw/xsleak-server/tree/main/Chrome-URL-Length-Inflation-Server).
